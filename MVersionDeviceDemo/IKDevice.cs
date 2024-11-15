@@ -21,7 +21,7 @@ namespace MVersionDeviceDemo
         public volatile bool m_bGrabingImage = false;
         // 是否已更新用户缓冲区
         public volatile bool m_bUpdateImage = false;
-        // 相机类型，0为GV相机，1为CL相机，2为CXP相机
+        // 相机类型，0为GV相机，1为CL相机，2为CXP相机,3为USB相机
         public int m_nType = -1;
         // 图像宽度
         public int m_nWidth = -1;

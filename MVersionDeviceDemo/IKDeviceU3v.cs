@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using IKapC.NET;
+using System.Drawing;
 namespace MVersionDeviceDemo
 {
     public class IKDeviceU3v : IKDevice
@@ -16,6 +17,10 @@ namespace MVersionDeviceDemo
         // 像素格式
         uint m_uPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_RGB888;
 
+        //创建彩色的指针
+        public IntPtr m_color = new IntPtr(-1);
+        public IntPtr m_gray = new IntPtr(-1);
+
         #region Callback Declare
         public IKapCLib.PITKSTREAMCALLBACK cbOnStartOfStreamProc = null;
         public IKapCLib.PITKSTREAMCALLBACK cbOnEndOfFrameProc = null;
@@ -26,7 +31,7 @@ namespace MVersionDeviceDemo
 
         public IKDeviceU3v()
         {
-            m_nType = 0;
+            m_nType = 3;
         }
 
         public override bool openDevice(int nDevIndex, int nBoardIndex)
@@ -263,6 +268,7 @@ namespace MVersionDeviceDemo
                 System.Diagnostics.Debug.WriteLine("Init stream error:Allocate buffer failed");
                 return false;
             }
+
             //根据缓冲区个数创建剩余缓冲区并添加进数据流中
             for (int i = 1; i < m_nFrameCount; i++)
             {
@@ -294,6 +300,7 @@ namespace MVersionDeviceDemo
             Marshal.FreeHGlobal(pBuffersz);
             m_pUserBuffer = Marshal.AllocHGlobal((int)nBuffersz);
             m_nBufferSize = (int)nBuffersz;
+
             return true;
         }
 
@@ -477,6 +484,7 @@ namespace MVersionDeviceDemo
                 System.Diagnostics.Debug.WriteLine("Read data error:Get buffer status failed");
                 return;
             }
+
             //buffer状态为full时进行读取
             status = (uint)Marshal.ReadInt32(bufferStatus);
             if (status != (uint)ItkBufferState.ITKBUFFER_VAL_STATE_FULL)
@@ -484,6 +492,7 @@ namespace MVersionDeviceDemo
                 System.Diagnostics.Debug.WriteLine("Read data error:Buffer is not full");
                 return;
             }
+
             Marshal.FreeHGlobal(bufferStatus);
             lock (m_mutexImage)
             {

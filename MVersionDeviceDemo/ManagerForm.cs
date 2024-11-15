@@ -19,7 +19,7 @@ namespace MVersionDeviceDemo
         {
             InitializeComponent();
             viewModel = new CamereaViewModel();
-            viewModel.Init();
+            viewModel.Init(null);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -34,7 +34,6 @@ namespace MVersionDeviceDemo
 
         private void button4_Click(object sender, EventArgs e)
         {
-
         }
 
         private void Dectect_Click(object sender, EventArgs e)
@@ -44,7 +43,30 @@ namespace MVersionDeviceDemo
 
         private void button3_Click(object sender, EventArgs e)
         {
+            object img = null;
+            this.viewModel.Grab(out img, "U3v", 0);
 
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            viewModel.ShowVideo(0);
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            viewModel.CloseVideo(0);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            viewModel.ShowVideo(1);
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            viewModel.CloseVideo(1);
         }
     }
 }
