@@ -89,7 +89,7 @@
     <Compile Include="IKDeviceCL.cs" />
     <Compile Include="IKDeviceCXP.cs" />
     <Compile Include="IKDeviceGV.cs" />
-    <Compile Include="IKDeviceU3v.cs" />
+    <Compile Include="IKDeviceU3V.cs" />
     <Compile Include="ManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>

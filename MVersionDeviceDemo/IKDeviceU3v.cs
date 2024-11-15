@@ -6,20 +6,15 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using IKapC.NET;
 using System.Drawing;
+using System.Drawing.Imaging;
 namespace MVersionDeviceDemo
 {
-    public class IKDeviceU3v : IKDevice
+    public class IKDeviceU3V : IKDevice
     {
         // 采集流句柄
         public IntPtr m_pStream = new IntPtr(-1);
         // 缓冲区列表
         public List<IntPtr> m_listBuffer = new List<IntPtr>();
-        // 像素格式
-        uint m_uPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_RGB888;
-
-        //创建彩色的指针
-        public IntPtr m_color = new IntPtr(-1);
-        public IntPtr m_gray = new IntPtr(-1);
 
         #region Callback Declare
         public IKapCLib.PITKSTREAMCALLBACK cbOnStartOfStreamProc = null;
@@ -29,16 +24,16 @@ namespace MVersionDeviceDemo
         public IKapCLib.PITKSTREAMCALLBACK cbOnEndOfStreamProc = null;
         #endregion
 
-        public IKDeviceU3v()
+        public IKDeviceU3V()
         {
-            m_nType = 3;
+            m_nType = 0;
         }
 
         public override bool openDevice(int nDevIndex, int nBoardIndex)
         {
             closeDevice();
             uint res = IKapCLib.ItkDevOpen((uint)nDevIndex
-                , (int)(ItkDeviceAccessMode.ITKDEV_VAL_ACCESS_MODE_EXCLUSIVE)
+                , (int)(ItkDeviceAccessMode.ITKDEV_VAL_ACCESS_MODE_CONTROL)
                 , ref m_pDev);
             if (!Check(res))
             {
@@ -73,162 +68,6 @@ namespace MVersionDeviceDemo
         }
 
         /*
-         *@brief:获取相机图片格式
-         *@param [in]:
-         *@return:相机图片格式
-         */
-        public uint getPixelFormat()
-        {
-            uint nPixelFormat = 0;
-            StringBuilder sPixelFormat = new StringBuilder(64);
-            uint nFormatLen = 64;
-            uint res = IKapCLib.ItkDevToString(m_pDev, "PixelFormat", sPixelFormat, ref nFormatLen);
-            if (!Check(res))
-            {
-                System.Diagnostics.Debug.WriteLine("Pixel format error:Get pixel format failed");
-                return 0;
-            }
-            if (sPixelFormat.ToString() == "Mono8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_MONO8;
-                m_nDepth = 8;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "Mono10")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_MONO10;
-                m_nDepth = 10;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "Mono12")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_MONO12;
-                m_nDepth = 12;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerGR8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_GR8;
-                m_nDepth = 8;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerRG8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_RG8;
-                m_nDepth = 8;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerGB8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_GB8;
-                m_nDepth = 8;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerBG8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_BG8;
-                m_nDepth = 8;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerGR10")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_GR10;
-                m_nDepth = 10;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerRG10")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_RG10;
-                m_nDepth = 10;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerGB10")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_GB10;
-                m_nDepth = 10;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerBG10")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_BG10;
-                m_nDepth = 10;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerGR12")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_GR12;
-                m_nDepth = 12;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerRG12")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_RG12;
-                m_nDepth = 12;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerGB12")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_GB12;
-                m_nDepth = 12;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "BayerBG12")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BAYER_BG12;
-                m_nDepth = 12;
-                m_nChannels = 1;
-            }
-            else if (sPixelFormat.ToString() == "RGB8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_RGB888;
-                m_nDepth = 8;
-                m_nChannels = 3;
-            }
-            else if (sPixelFormat.ToString() == "RGB10")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_RGB101010;
-                m_nDepth = 10;
-                m_nChannels = 3;
-            }
-            else if (sPixelFormat.ToString() == "RGB12")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_RGB121212;
-                m_nDepth = 12;
-                m_nChannels = 3;
-            }
-            else if (sPixelFormat.ToString() == "BGR8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BGR888;
-                m_nDepth = 8;
-                m_nChannels = 3;
-            }
-            else if (sPixelFormat.ToString() == "BGR10")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BGR101010;
-                m_nDepth = 10;
-                m_nChannels = 3;
-            }
-            else if (sPixelFormat.ToString() == "BGR12")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_BGR121212;
-                m_nDepth = 12;
-                m_nChannels = 3;
-            }
-            else if (sPixelFormat.ToString() == "YUV422_8")
-            {
-                nPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_YUV422_8_UYUV;
-                m_nDepth = 8;
-                m_nChannels = 3;
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("Pixel format error:Undefined format type");
-                return 0;
-            }
-            return nPixelFormat;
-        }
-
-        /*
          * @brief:申请相机采集流，相机缓冲区以及用户缓冲区
          * @return:是否申请成功
          */
@@ -250,12 +89,12 @@ namespace MVersionDeviceDemo
                 return false;
             }
             m_nHeight = (int)nHeight;
-            m_uPixelFormat = getPixelFormat();
-            if (m_uPixelFormat == 0)
+            m_uCameraPixelFormat = getPixelFormat();
+            if (m_uCameraPixelFormat == 0)
                 return bReturn;
             //创建第一个缓冲区，设置为数据流默认缓冲区
             IntPtr hBuffer = new IntPtr(-1);
-            res = IKapCLib.ItkBufferNew(nWidth, nHeight, m_uPixelFormat, ref hBuffer);
+            res = IKapCLib.ItkBufferNew(nWidth, nHeight, m_uCameraPixelFormat, ref hBuffer);
             if (!Check(res))
             {
                 System.Diagnostics.Debug.WriteLine("Init stream error:Create first buffer failed");
@@ -268,11 +107,10 @@ namespace MVersionDeviceDemo
                 System.Diagnostics.Debug.WriteLine("Init stream error:Allocate buffer failed");
                 return false;
             }
-
             //根据缓冲区个数创建剩余缓冲区并添加进数据流中
             for (int i = 1; i < m_nFrameCount; i++)
             {
-                res = IKapCLib.ItkBufferNew(nWidth, nHeight, m_uPixelFormat, ref hBuffer);
+                res = IKapCLib.ItkBufferNew(nWidth, nHeight, m_uCameraPixelFormat, ref hBuffer);
                 if (!Check(res))
                 {
                     System.Diagnostics.Debug.WriteLine("Init stream error:Create new buffer failed");
@@ -300,7 +138,6 @@ namespace MVersionDeviceDemo
             Marshal.FreeHGlobal(pBuffersz);
             m_pUserBuffer = Marshal.AllocHGlobal((int)nBuffersz);
             m_nBufferSize = (int)nBuffersz;
-
             return true;
         }
 
@@ -326,6 +163,7 @@ namespace MVersionDeviceDemo
             //采集超时时间
             IntPtr timeOut = Marshal.AllocHGlobal(4);
             Marshal.WriteInt32(timeOut, 0, (int)IKapCLib.ITKSTREAM_CONTINUOUS);
+
 
             //设置采集模式
             res = IKapCLib.ItkStreamSetPrm(m_pStream, (uint)ItkStreamPrm.ITKSTREAM_PRM_START_MODE, startMode);
@@ -484,7 +322,6 @@ namespace MVersionDeviceDemo
                 System.Diagnostics.Debug.WriteLine("Read data error:Get buffer status failed");
                 return;
             }
-
             //buffer状态为full时进行读取
             status = (uint)Marshal.ReadInt32(bufferStatus);
             if (status != (uint)ItkBufferState.ITKBUFFER_VAL_STATE_FULL)
@@ -492,12 +329,13 @@ namespace MVersionDeviceDemo
                 System.Diagnostics.Debug.WriteLine("Read data error:Buffer is not full");
                 return;
             }
-
             Marshal.FreeHGlobal(bufferStatus);
             lock (m_mutexImage)
             {
                 IKapCLib.ItkBufferRead(m_listBuffer[m_nCurFrameIndex], 0, m_pUserBuffer, (uint)m_nBufferSize);
                 m_bUpdateImage = true;
+                res = IKapCLib.ItkBufferBayerConvert(m_listBuffer[m_nCurFrameIndex], m_color, (uint)ItkBufferBayer.ITKBUFFER_VAL_BAYER_RGGB);
+
             }
             m_nCurFrameIndex++;
             m_nCurFrameIndex = m_nCurFrameIndex % m_nFrameCount;

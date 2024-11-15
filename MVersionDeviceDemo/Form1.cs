@@ -205,7 +205,7 @@ namespace MVersionDeviceDemo
                     pDev = new IKDeviceGV();
                     break;
                 case IKDeviceType.DEVICE_USB:
-                    pDev = new IKDeviceU3v();
+                    pDev = new IKDeviceU3V();
                     break;
                 case IKDeviceType.DEVICE_CML:
                     pDev = new IKDeviceCL();

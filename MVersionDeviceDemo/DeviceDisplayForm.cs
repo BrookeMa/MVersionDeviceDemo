@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Threading;
 using IKapBoardClassLibrary;
+using IKapC.NET;
 
 namespace MVersionDeviceDemo
 {
@@ -23,10 +24,10 @@ namespace MVersionDeviceDemo
         public SynchronizationContext m_imageUpdateSync;
         // 采集结束上下文
         public SynchronizationContext m_grabStopSync;
-        // 是否正在采集
-        public volatile bool m_bGrabing = false;
-        // 是否需要自动结束采集
-        public bool m_bIsAutoStop = false;
+        // 是否正在显示
+        public volatile bool m_bShowing = false;
+        // 相机是否为连续采集模式
+        public bool m_bIsContinousGrab = false;
         // 窗体绑定的设备索引，在窗体创建时传入
         public int m_nIndex = -1;
         // 窗体最大高度
@@ -40,7 +41,7 @@ namespace MVersionDeviceDemo
          * @param [in] nIndex: 设备索引
          * 
          */
-        public DeviceDisplayForm(IKDevice pDev,int nIndex)
+        public DeviceDisplayForm(IKDevice pDev, int nIndex)
         {
             InitializeComponent();
             m_imageUpdateSync = SynchronizationContext.Current;
@@ -62,7 +63,11 @@ namespace MVersionDeviceDemo
             Thread thread = new Thread(new ParameterizedThreadStart(workThread));
             thread.Start(this);
             if (nCount != 0)
-                m_bIsAutoStop = true;
+                m_bIsContinousGrab = false;
+            else
+            {
+                m_bIsContinousGrab = true;
+            }
             if (!m_pDev.startGrab(nCount))
                 return;
         }
@@ -79,7 +84,8 @@ namespace MVersionDeviceDemo
 
         public void stopGrab()
         {
-            m_pDev.stopGrab();
+            if (m_pDev.m_bGrabingImage) m_pDev.stopGrab();
+            while (m_bShowing) { Thread.Sleep(1); }
             m_pDev.clearBuffer();
         }
 
@@ -90,7 +96,7 @@ namespace MVersionDeviceDemo
          */
         public void saveImage(string format)
         {
-            if (m_bGrabing || this.pictureBoxImage.Image == null)
+            if (m_bShowing || this.pictureBoxImage.Image == null)
                 return;
             SaveFileDialog saveImg = new SaveFileDialog();
             saveImg.Title = "图片保存";
@@ -140,42 +146,85 @@ namespace MVersionDeviceDemo
         {
             DeviceDisplayForm hDisplay = obj as DeviceDisplayForm;
             BufferToImage hBuffer = new BufferToImage(hDisplay.m_pDev.m_nBufferSize
-                , hDisplay.m_pDev.m_nDepth, hDisplay.m_pDev.m_nChannels
-                , hDisplay.m_pDev.m_nWidth, hDisplay.m_pDev.m_nHeight);
+                , hDisplay.m_pDev.m_nDepth, hDisplay.m_pDev.m_nImageDepth, hDisplay.m_pDev.m_nChannels
+                , hDisplay.m_pDev.m_nWidth, hDisplay.m_pDev.m_nHeight, hDisplay.m_pDev.m_nBayerPattern);
             Image im = null;
-            do
+            while (!hDisplay.m_pDev.m_bGrabingImage)
             {
                 Thread.Sleep(1);
-            } while (!hDisplay.m_pDev.m_bGrabingImage);
-            hDisplay.m_bGrabing = true;
-            while(hDisplay.m_bGrabing)
+            }
+            hDisplay.m_bShowing = true;
+            while (hDisplay.m_pDev.m_bGrabingImage)
             {
-                if (hDisplay.m_bIsAutoStop)
-                    IKapBoard.IKapWaitGrab(hDisplay.m_pDev.m_pBoard);
                 if (hDisplay.m_pDev.m_bUpdateImage)
                 {
                     lock (hDisplay.m_pDev.m_mutexImage)
                     {
                         hDisplay.m_pDev.m_bUpdateImage = false;
-                        im = hBuffer.toImage(hDisplay.m_pDev.m_pUserBuffer);
+                        //对于Bayer图像，转换为RGB格式
+                        if (hDisplay.m_pDev.m_nBayerPattern != 0)
+                        {
+                            IntPtr pConvertedData = Marshal.AllocHGlobal(hBuffer.m_nBufferSize);
+                            //获取相机像素格式
+                            hDisplay.m_pDev.m_uCameraPixelFormat = hDisplay.m_pDev.getPixelFormat();
+                            if (0 == hDisplay.m_pDev.m_uCameraPixelFormat)
+                            {
+                                System.Diagnostics.Debug.WriteLine("getPixelFormat excute failed!");
+                                Marshal.FreeHGlobal(pConvertedData);
+
+                                break;
+                            }
+                            //根据bayer图像位深确定转换后的RGB图像的像素格式
+                            uint uDstPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_RGB888;
+                            if (hDisplay.m_pDev.m_nDepth == 8)
+                            {
+                                ;
+                            }
+                            else if (hDisplay.m_pDev.m_nDepth == 12)
+                            {
+                                uDstPixelFormat = (uint)ItkBufferFormat.ITKBUFFER_VAL_FORMAT_RGB121212;
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("The bit_Depth of bayer image is not supported!");
+                                Marshal.FreeHGlobal(pConvertedData);
+
+                                break;
+                            }
+                            //图像转换
+                            if (!IKDevice.Bayer2RGB(hDisplay.m_pDev.m_pUserBuffer, hDisplay.m_pDev.m_uCameraPixelFormat, ref pConvertedData, uDstPixelFormat, hBuffer.m_nWidth, hBuffer.m_nHeight, hDisplay.m_pDev.m_nBayerPattern))
+                            {
+                                System.Diagnostics.Debug.WriteLine("Bayer transform to RGB failed!");
+                                Marshal.FreeHGlobal(pConvertedData);
+
+                                break;
+                            }
+
+                            im = hBuffer.toImage(pConvertedData);
+                            Marshal.FreeHGlobal(pConvertedData);
+                        }
+                        else
+                        {
+                            im = hBuffer.toImage(hDisplay.m_pDev.m_pUserBuffer);
+                        }
                     }
                     hDisplay.m_imageUpdateSync.Post(hDisplay.ImageUpdateSyncContext, im.Clone());
                     im.Dispose();
                 }
                 if (!hDisplay.m_pDev.m_bGrabingImage)
                     break;
-                Thread.Sleep(10);
+                //Thread.Sleep(10);
             }
+            hDisplay.m_bShowing = false;
             hBuffer.freeBuffer();
             hDisplay.m_grabStopSync.Post(hDisplay.GrabStopSyncContext, null);
+
         }
 
         // 停止采集
         private void GrabStopSyncContext(object obj)
         {
-            m_bGrabing = false;
-            if (m_bIsAutoStop)
-                stopGrab();
+            stopGrab();
         }
 
         // 刷新图像
@@ -188,12 +237,12 @@ namespace MVersionDeviceDemo
 
         private void DeviceDisplayForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(m_bGrabing)
+            if (m_bShowing)
             {
                 m_pDev.stopGrab();
                 do
                 {
-                } while (m_pDev.m_bGrabingImage);
+                } while (m_pDev.m_bGrabingImage); //等待
             }
             m_pDev.clearBuffer();
             m_pDev.closeDevice();

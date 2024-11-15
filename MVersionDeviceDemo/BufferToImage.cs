@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
+using IKapC.NET;
 
 namespace MVersionDeviceDemo
 {
@@ -23,43 +25,74 @@ namespace MVersionDeviceDemo
         public object m_mutexBitmap = new object();
         // 缓冲区大小
         public int m_nBufferSize = -1;
-        // 像素位数
+        // 位深
         public int m_nDepth = -1;
+        // 图像深度
+        public int m_nImageDepth = -1;
         // 图像通道数
-        public  int m_nChannels = 4;
+        public int m_nChannels = -1;
         // 图像宽度
         public int m_nWidth = -1;
         // 图像高度
-        public  int m_nHeight = -1;
+        public int m_nHeight = -1;
+        //图像bayer格式：0:非bayer格式; 1:BGGR; 2:RGGB; 3:GBRG; 4:GRBG
+        public int m_nBayerPattern = -1;
         // Bitmap
         public Bitmap m_bmp = null;
+
 
         /*
          * @brief: 构造函数
          * @param [in] nSize: 缓冲区大小
-         * @param [in] nDepth: 像素位数
+         * @param [in] nDepth: 位深
+         * @param [in] nDepth: 位深
          * @param [in] nChannels: 图像通道数
          * @param [in] nWidth: 图像宽度
          * @param [in] nHeight: 图像高度
          * 
          */
-        public BufferToImage(int nSize,int nDepth,int nChannels,int nWidth,int nHeight)
+        public BufferToImage(int nSize, int nDepth, int nImageDepth, int nChannels, int nWidth, int nHeight, int nBayerPattern)
         {
-            m_pBuffer = Marshal.AllocHGlobal(nSize);
-            m_nBufferSize = nSize;
+            if (nBayerPattern == 0)
+            {
+                m_pBuffer = Marshal.AllocHGlobal(nSize);
+                m_nBufferSize = nSize;
+                m_nChannels = nChannels;
+                m_nImageDepth = nImageDepth;
+            }
+            else
+            {
+                //修改BufferToImage参数,适配bayer图像转换的RGB图像
+                m_pBuffer = Marshal.AllocHGlobal(nSize * 3);
+                m_nBufferSize = nSize * 3;
+                m_nChannels = 3;
+                m_nImageDepth = nImageDepth * 3;
+            }
             m_nDepth = nDepth;
-            m_nChannels = nChannels;
             m_nWidth = nWidth;
             m_nHeight = nHeight;
+            //m_nBayerPattern = nBayerPattern;
             PixelFormat nPixelFormat = PixelFormat.Undefined;
-            switch(nChannels)
+            switch (m_nChannels)
             {
                 case 1:
                     nPixelFormat = PixelFormat.Format8bppIndexed;
                     break;
                 case 3:
                 case 4:
-                    nPixelFormat = PixelFormat.Format24bppRgb;
+                    if (m_nImageDepth == 24)
+                    {
+                        nPixelFormat = PixelFormat.Format24bppRgb;
+                    }
+                    else if (m_nImageDepth == 48)
+                    {
+                        nPixelFormat = PixelFormat.Format48bppRgb;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Not supported imageDepth!", "Error", MessageBoxButtons.OK);
+                    }
+
                     break;
             }
             m_bmp = new Bitmap(m_nWidth, m_nHeight, nPixelFormat);
@@ -94,12 +127,12 @@ namespace MVersionDeviceDemo
         public Image toImage(IntPtr pSrc)
         {
             Image im = null;
-            lock(m_mutexBitmap)
+            lock (m_mutexBitmap)
             {
                 lock (m_mutexBuffer)
                 {
                     CopyMemory(m_pBuffer, pSrc, m_nBufferSize);
-                    if(m_nChannels == 4)
+                    if (m_nChannels == 4)
                     {
                         readRGBC();
                         im = (Image)m_bmp.Clone();
@@ -107,35 +140,15 @@ namespace MVersionDeviceDemo
                     }
                     Rectangle rect = new Rectangle(0, 0, m_bmp.Width, m_bmp.Height);
                     BitmapData bitmapData = m_bmp.LockBits(rect, ImageLockMode.ReadWrite, m_bmp.PixelFormat);
-                    int nShift = m_nDepth - 8;
                     int nStride = m_nBufferSize / m_bmp.Height;
-                    // 8bit 像素直接拷贝，高于8位的去除低位
-                    if(m_nDepth == 8)
+                    for (int i = 0; i < m_bmp.Height; i++)
                     {
-                        for (int i = 0; i < m_bmp.Height; i++)
-                        {
-                            IntPtr iptrDst = bitmapData.Scan0 + bitmapData.Stride * i;
-                            IntPtr iptrSrc = m_pBuffer + nStride * i;
-                            CopyMemory(iptrDst, iptrSrc, nStride);
-                        }
-                        m_bmp.UnlockBits(bitmapData);
+                        IntPtr iptrDst = bitmapData.Scan0 + bitmapData.Stride * i;
+                        IntPtr iptrSrc = m_pBuffer + nStride * i;
+                        CopyMemory(iptrDst, iptrSrc, nStride);
                     }
-                    else
-                    {
-                        short[] pData = new short[m_nBufferSize / 2];
-                        byte[] pDstData = new byte[m_nBufferSize];
-                        nStride = bitmapData.Stride;
-                        Marshal.Copy(m_pBuffer, pData, 0, m_nBufferSize / 2);
-                        for (int i = 0; i < bitmapData.Height; i++)
-                        {
-                            for (int j = 0; j < nStride; j++)
-                            {
-                                pDstData[i * nStride + j] = (byte)(pData[i * nStride + j] >> nShift);
-                            }
-                        }
-                        Marshal.Copy(pDstData, 0, bitmapData.Scan0, (m_nBufferSize / 2));
-                        m_bmp.UnlockBits(bitmapData);
-                    }
+                    m_bmp.UnlockBits(bitmapData);
+
                     im = (Image)m_bmp.Clone();
                 }
             }

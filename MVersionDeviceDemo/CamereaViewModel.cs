@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace MVersionDeviceDemo
 {
@@ -49,11 +50,11 @@ namespace MVersionDeviceDemo
         /// <summary>
         /// 上相机 Camere Link
         /// </summary>
-        IKDevice devCL = new IKDeviceCL();
+        IKDeviceCL devCL = new IKDeviceCL();
         /// <summary>
         /// 下相机 USB 3.0 相机
         /// </summary>
-        IKDevice devU3v = new IKDeviceU3v();
+        IKDeviceU3V devU3v = new IKDeviceU3V();
     
         /// <summary>
         /// 上相机 Camera Link 相机显示窗口
@@ -217,7 +218,12 @@ namespace MVersionDeviceDemo
         /// <returns></returns>
         public int Save(string camera, string filePath)
         {
+            if (camera == "U3v")
+            {
 
+
+             } 
+           
             return 0;
         }
 
@@ -233,7 +239,8 @@ namespace MVersionDeviceDemo
             img = null;
             if (name == "U3v")
             {
-                this.devU3v.startGrab(1);
+                // devU3v.startGrab(1);
+                displayFormU3v.showImage(1);
             }
             
             return 0;
