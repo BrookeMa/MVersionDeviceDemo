@@ -85,7 +85,7 @@
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(154, 78);
             this.button5.TabIndex = 4;
-            this.button5.Text = "Show Video U3v";
+            this.button5.Text = "Show Video U3V";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 

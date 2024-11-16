@@ -209,6 +209,15 @@ namespace MVersionDeviceDemo
                         }
                     }
                     hDisplay.m_imageUpdateSync.Post(hDisplay.ImageUpdateSyncContext, im.Clone());
+
+                    // 将图片保存到Manager里面，保证连续取图的时候，可以存图片
+                    if (CameraManager.Instance.m_bGrabOnceRequestedU3V)
+                    {
+                        CameraManager.Instance.imageU3V = im.Clone();
+                        CameraManager.Instance.m_bGrabOnceRequestedU3V = false;
+                    }
+                    
+
                     im.Dispose();
                 }
                 if (!hDisplay.m_pDev.m_bGrabingImage)

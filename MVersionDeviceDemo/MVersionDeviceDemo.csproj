@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BufferToImage.cs" />
+    <Compile Include="CameraManager.cs" />
     <Compile Include="CamereaViewModel.cs" />
     <Compile Include="DeviceDisplayForm.cs">
       <SubType>Form</SubType>

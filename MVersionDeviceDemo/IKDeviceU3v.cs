@@ -272,7 +272,6 @@ namespace MVersionDeviceDemo
             IKapCLib.ItkStreamUnregisterCallback(m_pStream, (uint)ItkStreamEventType.ITKSTREAM_VAL_EVENT_TYPE_END_OF_FRAME);
             return true;
         }
-
         /*
          * @brief: 清除申请的缓冲区和数据流
          * @return:
@@ -335,7 +334,6 @@ namespace MVersionDeviceDemo
                 IKapCLib.ItkBufferRead(m_listBuffer[m_nCurFrameIndex], 0, m_pUserBuffer, (uint)m_nBufferSize);
                 m_bUpdateImage = true;
                 res = IKapCLib.ItkBufferBayerConvert(m_listBuffer[m_nCurFrameIndex], m_color, (uint)ItkBufferBayer.ITKBUFFER_VAL_BAYER_RGGB);
-
             }
             m_nCurFrameIndex++;
             m_nCurFrameIndex = m_nCurFrameIndex % m_nFrameCount;

@@ -34,7 +34,7 @@ namespace MVersionDeviceDemo
 
         private void button4_Click(object sender, EventArgs e)
         {
-            viewModel.Save("U3v", "D:\\1.bmp");
+            viewModel.Save("U3V", "D:\\2.bmp");
         }
 
         private void Dectect_Click(object sender, EventArgs e)
@@ -45,7 +45,7 @@ namespace MVersionDeviceDemo
         private void button3_Click(object sender, EventArgs e)
         {
             object img = null;
-            this.viewModel.Grab(out img, "U3v", 1);
+            this.viewModel.Grab(out img, "U3V", 1);
 
 
         }

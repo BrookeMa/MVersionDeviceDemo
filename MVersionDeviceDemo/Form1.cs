@@ -56,7 +56,7 @@ namespace MVersionDeviceDemo
             IKapCLib.ITK_CL_DEV_INFO pClDevInfo = new IKapCLib.ITK_CL_DEV_INFO();
             IKapCLib.ITK_CXP_DEV_INFO pCxpDevInfo = new IKapCLib.ITK_CXP_DEV_INFO();
             IKapCLib.ITKGIGEDEV_INFO pGvDevInfo = new IKapCLib.ITKGIGEDEV_INFO();
-            IKapCLib.ITK_U3V_DEV_INFO pU3vDevInfo = new IKapCLib.ITK_U3V_DEV_INFO();
+            IKapCLib.ITK_U3V_DEV_INFO pU3VDevInfo = new IKapCLib.ITK_U3V_DEV_INFO();
             for (uint i = 0; i < nDevCount; ++i)
             {
                 IKDeviceInfo pInfo = new IKDeviceInfo();
@@ -73,7 +73,7 @@ namespace MVersionDeviceDemo
                 }
                 else if (pDevInfo.DeviceClass.CompareTo("USB3Vision") == 0)
                 {
-                    res = IKapCLib.ItkManGetU3VDeviceInfo(i, ref pU3vDevInfo);
+                    res = IKapCLib.ItkManGetU3VDeviceInfo(i, ref pU3VDevInfo);
                     if (res != (uint)ItkStatusErrorId.ITKSTATUS_OK)
                         return;
                     pInfo.nType = IKDeviceType.DEVICE_USB;
