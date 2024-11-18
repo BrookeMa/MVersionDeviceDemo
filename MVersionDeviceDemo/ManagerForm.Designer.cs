@@ -92,9 +92,9 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(467, 333);
+            this.button6.Location = new System.Drawing.Point(74, 332);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(145, 78);
+            this.button6.Size = new System.Drawing.Size(154, 70);
             this.button6.TabIndex = 5;
             this.button6.Text = "Close Video";
             this.button6.UseVisualStyleBackColor = true;
@@ -104,7 +104,7 @@
             // 
             this.button7.Location = new System.Drawing.Point(467, 227);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(145, 76);
+            this.button7.Size = new System.Drawing.Size(145, 67);
             this.button7.TabIndex = 7;
             this.button7.Text = "Show Video CL";
             this.button7.UseVisualStyleBackColor = true;
@@ -112,7 +112,7 @@
             // 
             // Dectect
             // 
-            this.Dectect.Location = new System.Drawing.Point(467, 31);
+            this.Dectect.Location = new System.Drawing.Point(467, 33);
             this.Dectect.Name = "Dectect";
             this.Dectect.Size = new System.Drawing.Size(145, 72);
             this.Dectect.TabIndex = 9;
