@@ -200,11 +200,11 @@ namespace MVersionDeviceDemo
             }
             if (devCL.isOpen())
             {
-                Console.WriteLine("CL相机打开");
+                Console.WriteLine("CL相机打开成功");
             }
             else
             {
-                Console.WriteLine("CL相机失败");
+                Console.WriteLine("CL相机打开失败");
             }
             if (devCL.isOpen() && devU3V.isOpen())
             {

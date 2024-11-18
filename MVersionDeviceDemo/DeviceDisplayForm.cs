@@ -91,56 +91,6 @@ namespace MVersionDeviceDemo
         }
 
         /*
-         * @brief: 保存图片
-         * @param [in]: 保存格式，目前可选bmp或tiff
-         * @return:
-         */
-        public void saveImage(string format)
-        {
-            if (m_bShowing || this.pictureBoxImage.Image == null)
-                return;
-            SaveFileDialog saveImg = new SaveFileDialog();
-            saveImg.Title = "图片保存";
-            saveImg.Filter = "BMP(*.bmp)|*.bmp|TIFF(*.tif)|*.tif";
-            int formatIndex = 0;
-            if (String.Equals(format, "bmp"))
-            {
-                saveImg.FilterIndex = 1;
-                formatIndex = 0;
-            }
-            else if (String.Equals(format, "tiff"))
-            {
-                saveImg.FilterIndex = 2;
-                formatIndex = 1;
-            }
-            if (saveImg.ShowDialog() == DialogResult.OK)
-            {
-                string fileName = saveImg.FileName.ToString();
-                if (fileName != "" && fileName != null)
-                {
-                    System.Drawing.Imaging.ImageFormat imgFormat = System.Drawing.Imaging.ImageFormat.Png;
-                    switch (formatIndex)
-                    {
-                        case 0:
-                            imgFormat = System.Drawing.Imaging.ImageFormat.Bmp;
-                            break;
-                        case 1:
-                            imgFormat = System.Drawing.Imaging.ImageFormat.Tiff;
-                            break;
-                    }
-                    try
-                    {
-                        this.pictureBoxImage.Image.Save(fileName, imgFormat);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Save image failure", "Warning", MessageBoxButtons.OK);
-                    }
-                }
-            }
-        }
-
-        /*
          * @brief: 图像转换线程，将缓冲区中的图像数据转换为Image
          */
         static void workThread(object obj)
