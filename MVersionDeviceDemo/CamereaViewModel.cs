@@ -83,7 +83,6 @@ namespace MVersionDeviceDemo
                     {
                         m_nMaxHeight = 400,
                         m_nMaxWidth = 400,
-                        Text = pInfo.sDevName,
                         Height = 400,
                         Width = 400
                     };
@@ -98,7 +97,6 @@ namespace MVersionDeviceDemo
                     {
                         m_nMaxHeight = 400,
                         m_nMaxWidth = 400,
-                        Text = pInfo.sDevName,
                         Height = 400,
                         Width = 400
                     };
@@ -260,10 +258,27 @@ namespace MVersionDeviceDemo
         {
             if (camera == "U3V")
             {
-                CameraManager.Instance.imageU3V.Save(filePath);
-             } 
-           
-            return 0;
+                if (CameraManager.Instance.imageU3V == null)
+                {
+                    Console.WriteLine($"U3V 相机没有抓拍到图片");
+                    return 0;
+                }
+                CameraManager.Instance.imageU3V.Save(filePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                Console.WriteLine($"U3V 相机图像已保存为 JPEG 格式，路径 {filePath}");
+            }
+
+            if (camera == "CL")
+            {
+                if (CameraManager.Instance.imageCL == null)
+                {
+                    Console.WriteLine($"CL 相机没有抓拍到图片");
+                    return 0;
+                }
+                CameraManager.Instance.imageCL.Save(filePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                Console.WriteLine($"CL 相机图像已保存为 JPEG 格式，路径 {filePath}");
+            }
+
+            return 1;
         }
 
         /// <summary>
@@ -278,15 +293,31 @@ namespace MVersionDeviceDemo
             img = null;
             if (name == "U3V")
             {
-
+                if (!devU3V.isOpen())
+                {
+                    Console.WriteLine($"U3V 相机未打开");
+                    return 0;
+                }
                 CameraManager.Instance.m_bGrabOnceRequestedU3V = true;
                 if (!displayFormU3V.m_bIsContinousGrab)
                 {
                     displayFormU3V.showImage(1);
-
                 }
             }
-            return 0;
+            if (name == "CL")
+            {
+                if (!devCL.isOpen())
+                {
+                    Console.WriteLine($"CL 相机未打开");
+                    return 0;
+                }
+                CameraManager.Instance.m_bGrabOnceRequestedCL = true;
+                if (!displayFormCL.m_bIsContinousGrab)
+                {
+                    displayFormCL.showImage(1);
+                }
+            }
+            return 1;
         }
 
         /// <summary>
@@ -295,32 +326,43 @@ namespace MVersionDeviceDemo
         /// <param name="index">相机编号</param>
         public void ShowVideo(int index = 0)
         {
+            
             if (index == 0)
             {
+                if (!devU3V.isOpen())
+                {
+                    Console.WriteLine("USB 3.0 相机未打开");
+                    return;
+                } 
                 displayFormU3V.showImage(0);
                 displayFormU3V.Show();
             }
 
             if (index == 1)
             {
+                if (!devCL.isOpen())
+                {
+                    Console.WriteLine("CL 相机未打开");
+                    return;
+                }
                 displayFormCL.showImage(0);
                 displayFormCL.Show();
             }
-            
         }
         /// <summary>
         /// </summary>
         /// <param name="index">相机编号</param>
         public void CloseVideo(int index = 0)
         {
-            if (displayFormU3V != null)
+            if (index == 0 && displayFormU3V != null)
             {
                 devU3V.clearBuffer();
                 devU3V.stopGrab();
                 displayFormU3V.Hide();
             }
 
-            if (displayFormCL != null)
+
+            if (index == 1 && displayFormCL != null)
             {
                 devCL.clearBuffer();
                 devCL.stopGrab();

@@ -215,6 +215,8 @@ namespace MVersionDeviceDemo
                 {
                     CopyMemory(m_pUserBuffer, hPtr, m_nBufferSize);
                     m_bUpdateImage = true;
+
+
                 }
             }
             m_nCurFrameIndex++;

@@ -34,7 +34,7 @@ namespace MVersionDeviceDemo
 
         private void button4_Click(object sender, EventArgs e)
         {
-            viewModel.Save("U3V", "D:\\2.bmp");
+            viewModel.Save("U3V", "D:\\u3v_1.jpeg");
         }
 
         private void Dectect_Click(object sender, EventArgs e)
@@ -46,8 +46,6 @@ namespace MVersionDeviceDemo
         {
             object img = null;
             this.viewModel.Grab(out img, "U3V", 1);
-
-
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -58,6 +56,7 @@ namespace MVersionDeviceDemo
         private void button6_Click(object sender, EventArgs e)
         {
             viewModel.CloseVideo(0);
+            viewModel.CloseVideo(1);
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -68,6 +67,17 @@ namespace MVersionDeviceDemo
         private void button8_Click(object sender, EventArgs e)
         {
             viewModel.CloseVideo(1);
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            object img = null;
+            this.viewModel.Grab(out img, "CL", 1);
+        }
+
+        private void button8_Click_1(object sender, EventArgs e)
+        {
+            viewModel.Save("CL", "D:\\cl_1.jpeg");
         }
     }
 }

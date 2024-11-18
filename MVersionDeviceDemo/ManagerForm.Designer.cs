@@ -34,9 +34,10 @@
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button7 = new System.Windows.Forms.Button();
             this.Dectect = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -65,7 +66,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(154, 71);
             this.button3.TabIndex = 2;
-            this.button3.Text = "Grab";
+            this.button3.Text = "Grab U3V";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -75,15 +76,15 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(145, 71);
             this.button4.TabIndex = 3;
-            this.button4.Text = "Save";
+            this.button4.Text = "Save U3V";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(74, 220);
+            this.button5.Location = new System.Drawing.Point(467, 126);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(154, 78);
+            this.button5.Size = new System.Drawing.Size(145, 71);
             this.button5.TabIndex = 4;
             this.button5.Text = "Show Video U3V";
             this.button5.UseVisualStyleBackColor = true;
@@ -91,7 +92,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(267, 314);
+            this.button6.Location = new System.Drawing.Point(467, 333);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(145, 78);
             this.button6.TabIndex = 5;
@@ -99,20 +100,11 @@
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(117, 328);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(18, 17);
-            this.checkBox1.TabIndex = 6;
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(74, 318);
+            this.button7.Location = new System.Drawing.Point(467, 227);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(154, 74);
+            this.button7.Size = new System.Drawing.Size(145, 76);
             this.button7.TabIndex = 7;
             this.button7.Text = "Show Video CL";
             this.button7.UseVisualStyleBackColor = true;
@@ -120,7 +112,7 @@
             // 
             // Dectect
             // 
-            this.Dectect.Location = new System.Drawing.Point(267, 220);
+            this.Dectect.Location = new System.Drawing.Point(467, 31);
             this.Dectect.Name = "Dectect";
             this.Dectect.Size = new System.Drawing.Size(145, 72);
             this.Dectect.TabIndex = 9;
@@ -128,14 +120,35 @@
             this.Dectect.UseVisualStyleBackColor = true;
             this.Dectect.Click += new System.EventHandler(this.Dectect_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(74, 227);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(154, 67);
+            this.button2.TabIndex = 10;
+            this.button2.Text = "Grab CL";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click_1);
+            // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(267, 227);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(145, 67);
+            this.button8.TabIndex = 11;
+            this.button8.Text = "Save CL";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click_1);
+            // 
             // ManagerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(729, 460);
+            this.ClientSize = new System.Drawing.Size(884, 460);
+            this.Controls.Add(this.button8);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.Dectect);
             this.Controls.Add(this.button7);
-            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
@@ -145,7 +158,6 @@
             this.Name = "ManagerForm";
             this.Text = "ManagerForm";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -157,8 +169,9 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button Dectect;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button8;
     }
 }

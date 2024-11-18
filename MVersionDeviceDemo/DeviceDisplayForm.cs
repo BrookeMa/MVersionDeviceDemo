@@ -48,6 +48,7 @@ namespace MVersionDeviceDemo
             m_grabStopSync = SynchronizationContext.Current;
             m_pDev = pDev;
             m_nIndex = nIndex;
+            ControlBox = false;
         }
 
         /*
@@ -211,12 +212,18 @@ namespace MVersionDeviceDemo
                     hDisplay.m_imageUpdateSync.Post(hDisplay.ImageUpdateSyncContext, im.Clone());
 
                     // 将图片保存到Manager里面，保证连续取图的时候，可以存图片
-                    if (CameraManager.Instance.m_bGrabOnceRequestedU3V)
+                    if (hDisplay.m_pDev is IKDeviceU3V && CameraManager.Instance.m_bGrabOnceRequestedU3V)
                     {
-                        CameraManager.Instance.imageU3V = im.Clone();
+                        // 观察一下
+                        CameraManager.Instance.imageU3V = (Image)im.Clone();
                         CameraManager.Instance.m_bGrabOnceRequestedU3V = false;
                     }
-                    
+                    if (hDisplay.m_pDev is IKDeviceCL && CameraManager.Instance.m_bGrabOnceRequestedU3V)
+                    {
+                        // 观察一下
+                        CameraManager.Instance.imageCL = (Image)im.Clone();
+                        CameraManager.Instance.m_bGrabOnceRequestedCL = false;
+                    }
 
                     im.Dispose();
                 }
