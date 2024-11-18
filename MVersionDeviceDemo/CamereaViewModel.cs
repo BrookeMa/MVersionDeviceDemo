@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.Drawing;
+using System.Drawing.Imaging;
+
 
 namespace MVersionDeviceDemo
 {
@@ -260,10 +263,10 @@ namespace MVersionDeviceDemo
             {
                 if (CameraManager.Instance.imageU3V == null)
                 {
-                    Console.WriteLine($"U3V 相机没有抓拍到图片");
+                    Console.WriteLine("U3V 相机没有抓拍到图片");
                     return 0;
                 }
-                CameraManager.Instance.imageU3V.Save(filePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                SaveImageWithQuality(CameraManager.Instance.imageU3V, filePath, 100L);
                 Console.WriteLine($"U3V 相机图像已保存为 JPEG 格式，路径 {filePath}");
             }
 
@@ -271,14 +274,35 @@ namespace MVersionDeviceDemo
             {
                 if (CameraManager.Instance.imageCL == null)
                 {
-                    Console.WriteLine($"CL 相机没有抓拍到图片");
+                    Console.WriteLine("CL 相机没有抓拍到图片");
                     return 0;
                 }
-                CameraManager.Instance.imageCL.Save(filePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                SaveImageWithQuality(CameraManager.Instance.imageCL, filePath, 100L);
                 Console.WriteLine($"CL 相机图像已保存为 JPEG 格式，路径 {filePath}");
             }
 
             return 1;
+        }
+
+        private void SaveImageWithQuality(Image image, string filePath, long quality)
+        {
+            // 获取JPEG编码器
+            ImageCodecInfo jpegCodec = ImageCodecInfo.GetImageDecoders()
+                                                     .FirstOrDefault(codec => codec.FormatID == ImageFormat.Jpeg.Guid);
+            if (jpegCodec == null)
+            {
+                throw new InvalidOperationException("未找到JPEG编码器！");
+            }
+
+            // 创建EncoderParameters并设置质量为100
+            using (EncoderParameters encoderParams = new EncoderParameters(1))
+            {
+                EncoderParameter qualityParam = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
+                encoderParams.Param[0] = qualityParam;
+
+                // 保存图像为JPEG，应用质量参数
+                image.Save(filePath, jpegCodec, encoderParams);
+            }
         }
 
         /// <summary>
